@@ -1,0 +1,67 @@
+(C) 2011 Jan-Willem Krans (janwillem32 <at> hotmail.com)
+This file is part of Video pixel shader pack.
+This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 2.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+interpolation methods, Catmull-Rom spline
+
+iteration pyramid:
+p       p       p       p       p      p
+            s       s       s
+              r   r   r
+                 q/q
+Note: the interval (p2+.5, p3) is handled by the mirror function 1.-t, all valid values for t are in the interval [p2, p2+.5]
+
+weights function:
+t2 = pow(t, 2);
+t3 = pow(t, 3);
+w0 = t2-(t3+t)/2.;
+w1 = t3*1.5+1.-t2*2.5;
+w2 = t2*2+t/2.-t3*1.5;
+w3 = (t3-t2)/2.;
+
+convolution function spline4, t is in the interval [m1, m2):
+n = ((((m1-m2)*3+m3-m0)*t+m0*2+m2*4-m1*5-m3)*t+m2-m0)*t/2.+m1;
+
+control points:
+.5 weights:
+t = .5;
+t2 = .25;
+t3 = .125;
+
+filling in the weights:
+w0 = -1/16.;
+w1 = 9/16.;
+w2 = 9/16.;
+w3 = -1/16.;
+
+----------------
+s0 (window: p0, p1, p2, p3):
+s0 = (p1*9+p2*9-p0-p3)/16.;
+
+s1 (window: p1, p2, p3, p4):
+s1 = (p2*9+p3*9-p1-p4)/16.;
+
+s2 (window: p2, p3, p4, p5):
+s2 = (p3*9+p4*9-p2-p5)/16.;
+
+----------------
+r0 (window: p1, s0, p2, s1):
+r0 = (s0*9+p2*9-p1-s1)/16.;
+r0 = (p1*66+p2*216+p4-p0*9-p3*18)/256.;
+
+r1 (spline5, window: s0, p2, s1, p3):
+r1 = (p2*9+s1*9-s0-p3)/16.;
+r1 = (p0+p2*216+p3*66-p1*18-p4*9)/256.;
+
+r2 (window: p2, s1, p3, s2):
+r2 = (s1*9+p3*9-p2-s2)/16.;
+r2 = (p2*66+p3*216+p5-p1*9-p4*18)/256.;
+
+----------------
+f(t) q0, spline6, interval [p2, p2+.25] (window: r0, p2, r1, s1):
+q0 = (((p0*3/256.-p1*7/128.+p2*3/32.-p3*9/128.+p4*5/256.)*t+p1*19/128.+p3*21/128.-p0*7/256.-p2/4.-p4*9/256.)*t+(p3-p1)*21/128.+(p0-p4)*5/256.)*t+p2;
+
+f(t) q1, spline6, interval (p2+.25, p2+.5] (window: p2, r1, s1, r2):
+q1 = (((((p0+p4)*3+p2*26+p5-p1*15-p3*18)*t+p1*35+p3*30-p0*5-p2*58-p4-p5)*t+p3*144-(p1+p4)*16-p2*112)*t+p0*2+p2*432+p3*132-p1*36-p4*18)/512.;

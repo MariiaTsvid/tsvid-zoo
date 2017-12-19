@@ -1,0 +1,24 @@
+Video pixel shader pack
+
+v1.4
+corrected "bilinear chroma up-sampling and color controls for SD&HD video input"
+improved performance for many Y'CbCr mode shaders
+
+v1.3
+added the Mitchell-Netravali cubic shaders
+added "detect even or odd coordinates, alternative"
+updated the the complete set of chroma interpolation shaders, all include color controls now
+updated Y'CbCr conversion efficiency for all shaders that perform Y'CbCr to RGB conversions
+
+v1.2:
+added "3LCD panel software alignment, Catmull-Rom spline6 interpolated" shaders
+added "r=6, sharpen complex, deband and denoise" and "r=6 blur" shaders
+corrected "sharpen complex, deband and denoise" shaders for bad performance during texture sampling stages and a clipping artifacts problem on very sharp contours
+added "flip and rotate sampling direction for RGB"
+
+v1.1:
+"brightness, contrast and gamma control for RGB": corrected brightness calculation
+"cubic B-spline6 width resizer" and "cubic B-spline6 height resizer": corrected naming for variables
+
+v1.0:
+Initial realease

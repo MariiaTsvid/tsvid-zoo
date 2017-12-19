@@ -1,0 +1,22 @@
+// (C) 2011 Jan-Willem Krans (janwillem32 <at> hotmail.com)
+// This file is part of Video pixel shader pack.
+// This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 2.
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+// contour monochrome
+// This shader can be run as a screen space pixel shader.
+// This shader requires compiling with ps_2_0, but higher is better, see http://en.wikipedia.org/wiki/Pixel_shader to look up what PS version your video card supports.
+// If possible, avoid compiling with the software emulation modes (ps_?_sw). Pixel shaders require a lot of processing power to run in real-time software mode.
+// Use this shader to add a monochrome contoured effect to an image.
+
+sampler s0;
+float2 c1 : register(c1);
+#define sp(a, b) tex2D(s0, tex+c1*float2(a, b))
+
+float4 main(float2 tex : TEXCOORD0) : COLOR
+{
+	float3 contour = (sp(0, 0)*4-sp(0, 4)-sp(4, 0)-sp(0, -4)-sp(-4, 0)).rgb;// contour detection
+	if(length(contour) < sqrt(3)/2.) return 0;// black output on surfaces
+	return 1;// white output on contours
+}

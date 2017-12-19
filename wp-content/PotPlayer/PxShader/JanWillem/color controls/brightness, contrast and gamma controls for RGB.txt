@@ -1,0 +1,37 @@
+// (C) 2011 Jan-Willem Krans (janwillem32 <at> hotmail.com)
+// This file is part of Video pixel shader pack.
+// This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 2.
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+// brightness, contrast and gamma controls for RGB
+// This shader can be run as a screen space pixel shader.
+// This shader requires compiling with ps_2_0, but higher is better, see http://en.wikipedia.org/wiki/Pixel_shader to look up what PS version your video card supports.
+// If possible, avoid compiling with the software emulation modes (ps_?_sw). Pixel shaders require a lot of processing power to run in real-time software mode.
+// This shader is meant to work with linear RGB input and output. Regular R'G'B' with a video gamma encoding will have to be converted with the linear gamma shaders to work properly.
+
+// fractions, either decimal or not, are allowed
+// RedBrightness, GreenBrightness and BlueBrightness, interval [-10, 10], default 0
+#define RedBrightness 0
+#define GreenBrightness 0
+#define BlueBrightness 0
+// RedContrast, GreenContrast and BlueContrast, interval [0, 10], default 1
+#define RedContrast 1
+#define GreenContrast 1
+#define BlueContrast 1
+// RedGamma, GreenGamma and BlueGamma, interval (0, 10], default 1
+#define RedGamma 1
+#define GreenGamma 1
+#define BlueGamma 1
+
+sampler s0;
+
+float4 main(float2 tex : TEXCOORD0) : COLOR
+{
+	float3 s1 = tex2D(s0, tex).rgb;// original pixel
+	s1 = s1*float3(RedContrast, GreenContrast, BlueContrast)+float3(RedBrightness, GreenBrightness, BlueBrightness);// process contrast and brightness on the original pixel
+	// preserve the sign bits of RGB values
+	float3 sb = sign(s1);
+	s1 *= sb;
+	return (sb*pow(s1, float3(RedGamma, GreenGamma, BlueGamma))).rgbb;// process gamma correction and output
+}

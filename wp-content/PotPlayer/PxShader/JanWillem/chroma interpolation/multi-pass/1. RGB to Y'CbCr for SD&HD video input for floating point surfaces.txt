@@ -1,0 +1,21 @@
+// (C) 2011 Jan-Willem Krans (janwillem32 <at> hotmail.com)
+// This file is part of Video pixel shader pack.
+// This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 2.
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+// RGB to Y'CbCr for SD&HD video input for floating point surfaces
+// This shader should not be run as a screen space pixel shader.
+// This shader requires compiling with ps_2_0, but higher is better, see http://en.wikipedia.org/wiki/Pixel_shader to look up what PS version your video card supports.
+// If possible, avoid compiling with the software emulation modes (ps_?_sw). Pixel shaders require a lot of processing power to run in real-time software mode.
+// This shader will change BT.709 [HD] or BT.601 [SD] derived RGB to Y'CbCr of an image.
+
+sampler s0;
+float2 c0;
+
+float4 main(float2 tex : TEXCOORD0) : COLOR
+{
+	float3 s1 = tex2D(s0, tex).rgb;// original pixel
+	if(c0.x < 1120 && c0.y < 630) return float3(dot(float3(.299, .587, .114), s1), dot(float3(-.1495/.886, -.2935/.886, .5), s1), dot(float3(.5, -.2935/.701, -.057/.701), s1)).xyzz;// SD RGB to Y'CbCr output
+	return float3(dot(float3(.2126, .7152, .0722), s1), dot(float3(-.1063/.9278, -.3576/.9278, .5), s1), dot(float3(.5, -.3576/.7874, -.0361/.7874), s1)).xyzz;// HD RGB to Y'CbCr output
+}

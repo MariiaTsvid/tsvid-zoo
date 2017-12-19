@@ -1,0 +1,87 @@
+// (C) 2011 Jan-Willem Krans (janwillem32 <at> hotmail.com)
+// This file is part of Video pixel shader pack.
+// This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 2.
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+// sphere, Catmull-Rom spline4×4 interpolated
+// This shader should be run as a screen space pixel shader if you are up-scaling.
+// This shader should not be run as a screen space pixel shader if you are down-scaling.
+// This shader requires compiling with ps_2_a, but higher is better, see http://en.wikipedia.org/wiki/Pixel_shader to look up what PS version your video card supports.
+// If possible, avoid compiling with the software emulation modes (ps_?_sw). Pixel shaders require a lot of processing power to run in real-time software mode.
+// This shader is meant to work with linear RGB input and output. Regular R'G'B' with a video gamma encoding will have to be converted with the linear gamma shaders to work properly.
+// Use this shader to apply an effect that looks like projecting the video from a rotating sphere.
+
+// fractions, either decimal or not, are allowed
+// rotation speed, in seconds per rotation
+#define rs 8.
+// border canvas size
+#define bs 8
+// border gamma factor
+#define bf 8
+// light position
+#define pl float3(3, -3, -4)
+// light intensity
+#define cl .25
+// light size
+#define sl 64
+// camera position
+#define pc float3(0, 0, -1)
+// sphere position
+#define ps float3(0, 0, .5)
+// sphere radius
+#define ra 2/acos(-1)
+// base size constant
+#define Ai 1.
+
+sampler s0;
+float4 c0;
+float2 c1;
+#define sp(a, b, c) float4 a = tex2D(s0, tex+c1*float2(b, c));
+
+float4 main(float2 tex : TEXCOORD0) : COLOR
+{
+	float ar = c0.y/c0.x;// aspect ratio
+	tex.x = tex.x/ar+.5-.5/ar;// surface rectangle to square
+	// relate the sphere to the camera position
+	float3 pd = normalize(float3(tex.x-.5, tex.y-.5, 0)-pc);
+	float B = 2*dot(pd, pc-ps);
+	float C = dot(pc-ps, pc-ps)-pow(ra, 2);
+	float D = B*B-4*Ai*C;// calculate the sphere
+	if(D < 0) return float4(0, 0, 0, 1);// output black borders, only map if things are inside the sphere
+
+	// intersection data
+	float3 p = pc+pd*(-sqrt(D)-B)/2./Ai;
+	float3 n = normalize(p-ps);
+	float3 l = normalize(pl-p);
+
+	float2 cd = .75*(.5-tex);// measure the distance to the image center
+	tex = acos(-n.xy)/acos(-1);// mapping the image onto the sphere
+	tex.x = frac(tex.x+frac(c0.w/rs))*ar;// rotation and aspect ratio correction
+
+	tex *= c0.xy;// normalize to texture width in pixels
+	float2 t = frac(tex);// calculate the difference between the output pixel and the original surrounding two pixels
+	tex = (tex-t+.5)*c1;// make the sampling position line up with an exact pixel coordinate for L1, normalized to the interval [0, 1)
+	// weights
+	float2 t2 = pow(t, 2);
+	float2 t3 = pow(t, 3);
+	float2 w0 = t2-(t3+t)/2.;
+	float2 w1 = t3*1.5+1.-t2*2.5;
+	float2 w2 = t2*2+t/2.-t3*1.5;
+	float2 w3 = (t3-t2)/2.;
+
+	// original pixels
+	sp(M0, -1, -1) sp(M1, -1, 0) sp(M2, -1, 1) sp(M3, -1, 2)
+	sp(L0, 0, -1) sp(L1, 0, 0) sp(L2, 0, 1) sp(L3, 0, 2)
+	sp(K0, 1, -1) sp(K1, 1, 0) sp(K2, 1, 1) sp(K3, 1, 2)
+	sp(J0, 2, -1) sp(J1, 2, 0) sp(J2, 2, 1) sp(J3, 2, 2)
+
+	// vertical interpolation
+	float4 Q0 = M0*w0.y+M1*w1.y+M2*w2.y+M3*w3.y;
+	float4 Q1 = L0*w0.y+L1*w1.y+L2*w2.y+L3*w3.y;
+	float4 Q2 = K0*w0.y+K1*w1.y+K2*w2.y+K3*w3.y;
+	float4 Q3 = J0*w0.y+J1*w1.y+J2*w2.y+J3*w3.y;
+	float4 P0 = Q0*w0.x+Q1*w1.x+Q2*w2.x+Q3*w3.x;// horizontal interpolation
+
+	return smoothstep(0, 1, P0-pow(bs*dot(cd, cd), bf))*dot(n, l)+cl*pow(max(dot(l, reflect(pd, n)), 0), sl);// add sphere edges, diffuse mapping, specular mapping and then output
+}

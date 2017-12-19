@@ -1,0 +1,87 @@
+// (C) 2011 Jan-Willem Krans (janwillem32 <at> hotmail.com)
+// This file is part of Video pixel shader pack.
+// This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 2.
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+// r=2, sharpen complex, deband and mild denoise
+// This shader should not be run as a screen space pixel shader.
+// This shader requires compiling with ps_2_a, but higher is better, see http://en.wikipedia.org/wiki/Pixel_shader to look up what PS version your video card supports.
+// If possible, avoid compiling with the software emulation modes (ps_?_sw). Pixel shaders require a lot of processing power to run in real-time software mode.
+// This shader is meant to work with linear RGB input and output. Regular R'G'B' with a video gamma encoding will have to be converted with the linear gamma shaders to work properly.
+// If present, deinterlacing artifacts will become worse with this shader.
+// Using at least 10-bit per color component input, processing and output also helps a lot to prevent color banding. The common 8-bit formats will always have banding. For testing the maximum debanding and denoising capacity of this shader, use "r=2 blur".
+// Temporal color banding in movies can not be solved without additional frame interpolation processing.
+// To test if the detection rules of this shader are correct, you can highlight areas by adding a "9" in front of the dot of a sharpening amount and run the shader on a test picture.
+
+// fractions, either decimal or not, are allowed
+// VideoGamma, interval [2., 3.], default 2.4, the video gamma input factor used to convert between the video input RGB and linear RGB during pre-processing
+#define VideoGamma 2.4
+// GammaCompensation, interval [1, 2], default 1.5, the gamma compensation factor to diminish denoising on darker pixels, a factor 1 will use the same grade of filtering on darker and lighter pixels, the current standards for consumer-grade video are lacking in dynamics for the lower brightness range, so a factor 1 will usually cause too much fitering on darker pixels
+#define GammaCompensation 1.5
+// NoiseLevel, interval [.5, 4], detection noise factor, .5 is for very plain, lossless, synthetic images, 1 is normal for digital lossy video and images, higher values will help counter grainy noise on surfaces and gradients, at the cost of the detail level
+#define NoiseLevel .75
+
+// Blur, interval [0, 3], blur to sharpen contrast detection limit, 0 means blur disabled
+#define Blur NoiseLevel/64./sqrt(3)*length(pow(Brightness, GammaCompensation/VideoGamma))
+// EdgeSharpen, interval [0, 3], edge sharpening detection limit, 3 means edge sharpening disabled, disabling this item will soften sharp contours
+#define EdgeSharpen 2*Blur
+
+// amount of sharpening for the different radial layers, 0 means disabled
+// Sharpen0, interval [0, 3], edge sharpening, can cause staircase artifacts on sharp contours if it is set too high
+#define Sharpen0 .0625
+// Sharpen1, interval [0, 3], first radial layer of sharpening
+#define Sharpen1 .375
+
+sampler s0;
+float2 c1 : register(c1);
+#define sp(a, b) tex2D(s0, tex+c1*float2(a, b))
+#define H0 Sharpen0*(sqrt(3)-dv)
+#define H1 Sharpen1*(sqrt(3)-dv)
+#define D0d(a, b) ((dv = length((s1+b)/2.-a)) > ES)? s1*(H0+1.)-a*H0
+#define D0o(a, b) ((dv = length((s1+b)/3.-a)) > ES)? s1*(H0+1.)-a*H0
+#define D1d(a, b) (dv > BN)? (t1+a)/1.125*(H1+1.)-b*H1
+#define D1o(a, b) (dv > BN)? (t1+a)/1.125*(H1+1.)-b/2.*H1
+#define D2d(a) (t1+a)/2.125
+#define D2o(a) (t1+a)/3.125
+#define Dd(a, b) (D0d(a, b) : D1d(a, b) : D2d(a+b))
+#define Do(a, b) (D0o(a, b) : D1o(a, b) : D2o(a+b))
+
+float4 main(float2 tex : TEXCOORD0) : COLOR
+{
+	// sampling area, circle radius = 2.5, divided into the original pixel and 8 sectors, 21 pixels in total, 2 or 3 pixels per sector, 2 radial layers
+	//	[    r3 r3 r4    ]
+	//	[ r2 s2 s3 s4 r6 ]
+	//	[ r5 s5 s1 s6 r6 ]
+	//	[ r5 s7 s8 s9 r9 ]
+	//	[    r7 r8 r8    ]
+	float3 s1 = sp(0, 0).rgb;// original pixel
+
+	// all pixels per group
+	float3 s2 = sp(-1, -1).rgb;
+	float3 s3 = sp(0, -1).rgb;
+	float3 s4 = sp(1, -1).rgb;
+	float3 s5 = sp(-1, 0).rgb;
+	float3 s6 = sp(1, 0).rgb;
+	float3 s7 = sp(-1, 1).rgb;
+	float3 s8 = sp(0, 1).rgb;
+	float3 s9 = sp(1, 1).rgb;
+
+	float3 r2 = sp(-2, -1).rgb;
+	float3 r3 = (sp(-1, -2)+sp(0, -2)).rgb;
+	float3 r4 = sp(1, -2).rgb;
+	float3 r5 = (sp(-2, 1)+sp(-2, 0)).rgb;
+	float3 r6 = (sp(2, 0)+sp(2, -1)).rgb;
+	float3 r7 = sp(-1, 2).rgb;
+	float3 r8 = (sp(0, 2)+sp(1, 2)).rgb;
+	float3 r9 = sp(2, 1).rgb;
+
+	float3 Brightness = (s1+s2+s3+s4+s5+s6+s7+s8+s9)/9.;// average linear brightness calculation, float3 intervals [0, 1]
+
+	// per sector blur or sharpen calculation
+	float dv;
+	float BN = Blur;// process brightness in blur limit detection
+	float ES = EdgeSharpen;// process brightness in edge sharpen limit detection
+	float3 t1 = s1/8.;// divide s1 to be used in 8 sectors
+	return ((Dd(s2, r2)+Do(s3, r3)+Dd(s4, r4)+Do(s5, r5)+Do(s6, r6)+Dd(s7, r7)+Do(s8, r8)+Dd(s9, r9))/8.).rgbb;// output sector average
+}

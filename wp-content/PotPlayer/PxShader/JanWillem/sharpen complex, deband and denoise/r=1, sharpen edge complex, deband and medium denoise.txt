@@ -1,0 +1,55 @@
+// (C) 2011 Jan-Willem Krans (janwillem32 <at> hotmail.com)
+// This file is part of Video pixel shader pack.
+// This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 2.
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+// r=1, sharpen edge complex, deband and medium denoise
+// This shader should not be run as a screen space pixel shader.
+// This shader requires compiling with ps_2_0, but higher is better, see http://en.wikipedia.org/wiki/Pixel_shader to look up what PS version your video card supports.
+// If possible, avoid compiling with the software emulation modes (ps_?_sw). Pixel shaders require a lot of processing power to run in real-time software mode.
+// This shader is meant to work with linear RGB input and output. Regular R'G'B' with a video gamma encoding will have to be converted with the linear gamma shaders to work properly.
+// If present, deinterlacing artifacts will become worse with this shader.
+// Using at least 10-bit per color component input, processing and output also helps a lot to prevent color banding. The common 8-bit formats will always have banding. For testing the maximum debanding and denoising capacity of this shader, use "r=1 blur".
+// Temporal color banding in movies can not be solved without additional frame interpolation processing.
+// To test if the detection rules of this shader are correct, you can uncomment the three lines of "float4(?, ?, ?, 0);" and run the shader on a test picture.
+
+// fractions, either decimal or not, are allowed
+// NoiseLevel, interval [.5, 4], detection noise factor, .5 is for very plain, lossless, synthetic images, 1 is normal for digital lossy video and images, higher values will help counter grainy noise on surfaces and gradients, at the cost of the detail level
+#define NoiseLevel 1
+
+// fractions, either decimal or not, are allowed
+// blur and sharpen detection
+// BlurLimit, interval [0, 36], maximum blur limit, 0 means disabled
+#define BlurLimit .25*NoiseLevel
+// SharpenLimit, interval [0, 36], minimum sharpen limit, 36 means disabled
+#define SharpenLimit 2*NoiseLevel
+
+// Sharpen, interval [0, 3], amount of sharpening, 0 means disabled
+#define Sharpen .5
+
+sampler s0;
+float2 c1 : register(c1);
+#define sp(a, b, c) float4 a = tex2D(s0, tex+c1*float2(b, c));
+
+float4 main(float2 tex : TEXCOORD0) : COLOR
+{
+	// sampling area, circle radius = 1.5, divided into the original pixel and 8 sectors, 9 pixels in total, 1 pixel per sector, 1 radial layer
+	//	[ s2 s3 s4 ]
+	//	[ s5 s1 s6 ]
+	//	[ s7 s8 s9 ]
+	sp(s1, 0, 0) sp(s2, -1, -1) sp(s3, 0, -1) sp(s4, 1, -1) sp(s5, -1, 0) sp(s6, 1, 0) sp(s7, -1, 1) sp(s8, 0, 1) sp(s9, 1, 1)
+
+	// vertical+horizontal+two digonal contour detection
+	float dv = dot(float4(1, 1, 1, 0), abs(s2+s3+s4-s7-s8-s9)+abs(s2+s5+s7-s4-s6-s9)+abs(s2+s3+s5-s6-s8-s9)+abs(s3+s4+s6-s5-s7-s8));
+
+	if(dv < BlurLimit) {// on surfaces and gradients, blur
+		//return float4(0, 1, 0, 1);
+		return (s1+s2+s3+s4+s5+s6+s7+s8+s9)/9.;}
+	if(dv > SharpenLimit) {// on contours, sharpen
+		//return float4(1, 0, 0, 1);
+		return s1*(1.+Sharpen)-(s2+s3+s4+s5+s6+s7+s8+s9)/8.*Sharpen;}
+	// outside contours, return original pixel
+	//return float4(0, 0, 1, 1);
+	return s1;
+}

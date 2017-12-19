@@ -1,0 +1,21 @@
+// Levels 0-256 to 16-235=ps_2_0
+
+// This shader should be run as a screen space pixel shader.
+// This shader requires compiling with ps_2_0, but higher is better, see http://en.wikipedia.org/wiki/Pixel_shader to look up what PS version your video card supports.
+// If possible, avoid compiling with the software emulation modes (ps_?_sw). Pixel shaders require a lot of processing power to run in real-time software mode.
+// Use this shader if near black, near white and nearly primary colors in an image are over-expanded on on a limited range display.
+// Never use any other filters or shaders after this shader that are affected by the color input. This also includes display color profiles.
+// This shader can only be used with a limited range Y'CbCr video output.
+
+sampler s0;
+float2 c0;
+
+float4 main(float2 tex : TEXCOORD0) : COLOR
+{
+	float3 s1 = tex2D(s0, tex).rgb;// original pixel
+	if(c0.x < 1120 && c0.y < 630) {
+		s1 = float3(dot(float3(.299, .587, .114), s1)*219/256.+16/219., dot(float3(-.1495/.886, -.2935/.886, .5), s1)*7/8., dot(float3(.5, -.2935/.701, -.057/.701), s1)*7/8.);	// SD RGB to Y'CbCr and compress ranges
+		return float4(s1.x+1.402*s1.z, s1.x-.202008/.587*s1.y-.419198/.587*s1.z, s1.x+1.772*s1.y, 1);}										// SD Y'CbCr to RGB output
+	s1 = float3(dot(float3(.2126, .7152, .0722), s1)*219/256.+16/219., dot(float3(-.1063/.9278, -.3576/.9278, .5), s1)*7/8., dot(float3(.5, -.3576/.7874, -.0361/.7874), s1)*7/8.);	// HD RGB to Y'CbCr and compress ranges
+	return float4(s1.x+1.5748*s1.z, s1.x-.13397432/.7152*s1.y-.33480248/.7152*s1.z, s1.x+1.8556*s1.y, 1);										// HD Y'CbCr to RGB output
+}

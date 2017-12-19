@@ -1,0 +1,31 @@
+// (C) 2011 Jan-Willem Krans (janwillem32 <at> hotmail.com)
+// This file is part of Video pixel shader pack.
+// This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 2.
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+// special 4÷2÷0 to 4÷2÷2 intermediate Mitchell-Netravali cubic5 chroma up-sampling
+// This shader should not be run as a screen space pixel shader.
+// This shader requires compiling with ps_2_0, but higher is better, see http://en.wikipedia.org/wiki/Pixel_shader to look up what PS version your video card supports.
+// If possible, avoid compiling with the software emulation modes (ps_?_sw). Pixel shaders require a lot of processing power to run in real-time software mode.
+// If used in combination with other shaders and filters, place this and other Y'CbCr-type shaders at the beginning of the processing chain.
+// Use this shader if the 4:2:0 sub-sampled chroma gets up-sampled in hardware by doubling the values, instead of interpolating between them.
+// The most notable artifacts produced by this problem are 2-by-2-sized pixel blocks if a red object is next to a dark background.
+// You can use the "chroma for SD&HD video input" shader with 200% picture magnification to test. It will make 4-by-4-sized pixel blocks everywhere in the picture if the up-sampling is wrong.
+// Use the "special 4÷2÷2 Mitchell-Netravali cubic5 chroma up-sampling and color controls" shader in combination with this shader to finish chroma up-sampling.
+// This shader can only use Y'CbCr input.
+
+sampler s0;
+float2 c0;
+float2 c1;
+#define sp(a, b) float4 a = tex2D(s0, tex+c1*float2(0, b*n));
+
+float4 main(float2 tex : TEXCOORD0) : COLOR
+{
+	// detect half of the even or odd coordinates for 4:2:0 sub-sampled chroma
+	float n = frac(tex.y*c0.y/2.);
+	n = (n > .5)? 2 : -2;// even y positive, odd y negative
+
+	sp(Q0, -2) sp(Q1, -1) sp(Q2, 0) sp(Q3, 1) sp(Q4, 2)// original pixels
+	return float3(Q2.x, Q0.yz*25/20736.+Q2.yz*16632/20736.+Q3.yz*5234/20736.-Q1.yz*770/20736.-Q4.yz*385/20736.).xyzz;// interpolated Y'CbCr output
+}

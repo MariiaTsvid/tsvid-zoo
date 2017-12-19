@@ -1,0 +1,46 @@
+// Projector film drive scratches=ps_2_0
+
+// (C) 2011 Jan-Willem Krans (janwillem32 <at> hotmail.com)
+// This file is part of Video pixel shader pack.
+// This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 2.
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+// projector film drive scratches
+// This shader can be run as a screen space pixel shader.
+// This shader requires compiling with ps_2_0, but higher is better, see http://en.wikipedia.org/wiki/Pixel_shader to look up what PS version your video card supports.
+// If possible, avoid compiling with the software emulation modes (ps_?_sw). Pixel shaders require a lot of processing power to run in real-time software mode.
+// Use this shader to apply an effect that looks like the scratches created by a projector film drive.
+
+// fractions, either decimal or not, are allowed
+
+// LightScratchAmount, interval [0, 5]
+#define LightScratchAmount .0625
+
+// HeavyScratchAmount, interval [.5, 9]
+#define HeavyScratchAmount 4.5
+
+// LightScratchSize, interval [0, 5]
+#define LightScratchSize .09375
+
+// HeavyScratchSize, interval [0, 9]
+#define HeavyScratchSize 1
+
+// RandomFactors; randomization factors, almost every type of input for each of the four components is allowed
+#define RandomFactors float4(pow(acos(-1), 4), exp(5), pow(13, acos(-1)/2.), sqrt(1997))
+
+sampler s0;
+float4 c0;
+
+#define rd(a) rn.a = frac(dot(rn, RandomFactors));
+
+float4 main(float2 tex : TEXCOORD0) : COLOR
+{
+	float4 rn = float4(tex.xx, c0.zw+exp(5))/64.;					// input coordinates and time factors
+	for(int i = 0; i < 2; ++i) {rd(x) rd(y) rd(z) rd(w)}				// randomize, a low run count will make patterned noise
+	float ScratchLight = max(0, .75-abs(.125-dot(LightScratchAmount, rn)))-.5;	// relate the randomized numbers to the amount of light scratches
+	float ScratchHeavy = max(0, .125-abs(1-dot(HeavyScratchAmount, rn)));		// relate the randomized numbers to the amount of heavy scratches
+	float4 s1 = tex2D(s0, tex);							// original pixel
+	//s1 = .5;									// uncomment this line to only display the generated scratches
+	return s1+LightScratchSize*ScratchLight+HeavyScratchSize*ScratchHeavy;		// output scratches over the original pixel
+}

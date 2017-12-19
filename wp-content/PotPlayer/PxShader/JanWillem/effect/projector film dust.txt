@@ -1,0 +1,35 @@
+// (C) 2011 Jan-Willem Krans (janwillem32 <at> hotmail.com)
+// This file is part of Video pixel shader pack.
+// This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 2.
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+// projector film dust
+// This shader can be run as a screen space pixel shader.
+// This shader requires compiling with ps_2_0, but higher is better, see http://en.wikipedia.org/wiki/Pixel_shader to look up what PS version your video card supports.
+// If possible, avoid compiling with the software emulation modes (ps_?_sw). Pixel shaders require a lot of processing power to run in real-time software mode.
+// Use this shader to apply an effect that looks like dust on a projector film.
+
+// fractions, either decimal or not, are allowed
+// DustAmount, interval [25, 2]
+#define DustAmount 15
+// ParticleSize, interval [3, .5]
+#define ParticleSize 1.5
+// DustOpacity, interval [0, 25]
+#define DustOpacity 2
+// RandomFactors; randomization factors, almost every type of input for each of the four components is allowed
+#define RandomFactors float4(pow(acos(-1), 4), exp(5), pow(13, acos(-1)/2.), sqrt(1997))
+
+sampler s0;
+float4 c0;
+#define rd(a) rn.a = frac(dot(rn, RandomFactors));
+
+float4 main(float2 tex : TEXCOORD0) : COLOR
+{
+	float4 rn = float4(tex.x*c0.x/c0.y*ParticleSize, tex.y*.375*ParticleSize, c0.zw+exp(5))/65536.;// input coordinates and time factors
+	for(int i = 0; i < 2; ++i) {rd(x) rd(y) rd(z) rd(w)}// randomize, a low run count will make patterned noise
+	float dust = max(0, .125-abs(4-dot(DustAmount, rn)));// relate the randomized numbers to the amount of dust
+	float4 s1 = tex2D(s0, tex);// original pixel
+	//s1 = .5;// uncomment this line to only display the generated dust
+	return s1-DustOpacity*dust;// output dust over the original pixel
+}

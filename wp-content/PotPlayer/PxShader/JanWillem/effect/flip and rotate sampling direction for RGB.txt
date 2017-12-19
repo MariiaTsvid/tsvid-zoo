@@ -1,0 +1,31 @@
+// (C) 2011 Jan-Willem Krans (janwillem32 <at> hotmail.com)
+// This file is part of Video pixel shader pack.
+// This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 2.
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+// flip and rotate sampling direction for RGB
+// This shader can be run as a screen space pixel shader.
+// This shader requires compiling with ps_2_0, but higher is better, see http://en.wikipedia.org/wiki/Pixel_shader to look up what PS version your video card supports.
+// If possible, avoid compiling with the software emulation modes (ps_?_sw). Pixel shaders require a lot of processing power to run in real-time software mode.
+// This shader will flip and rotate the red, green and blue components individually every 32 frames.
+// Note that this shader is only accurate in rotating squares.
+
+sampler s0;
+float3 c0;
+
+float4 main(float2 tex : TEXCOORD0) : COLOR{
+	float ct = frac(c0.z/256.+.0625);// 8-state counter
+
+	float2 rs, gs, bs, txi = tex.yx;
+	if(ct < .125) {rs = tex*float2(-1, 1); gs = txi*float2(-1, 1); bs = tex*-1;}
+	else if(ct < .25) {rs = txi*float2(1, -1); gs = txi*-1; bs = tex;}
+	else if(ct < .375) {rs = tex*float2(1, -1); gs = txi; bs = tex*float2(-1, 1);}
+	else if(ct < .5) {rs = txi*float2(-1, 1); gs = tex*-1; bs = txi*float2(1, -1);}
+	else if(ct < .625) {rs = txi*-1; gs = tex; bs = tex*float2(1, -1);}
+	else if(ct < .75) {rs = txi; gs = tex*float2(-1, 1); bs = txi*float2(-1, 1);}
+	else if(ct < .875) {rs = tex*-1; gs = txi*float2(1, -1); bs = txi*-1;}
+	else {rs = tex; gs = tex*float2(1, -1); bs = txi;}
+
+	return float4(tex2D(s0, frac(rs)).r, tex2D(s0, frac(gs)).g, tex2D(s0, frac(bs)).ba);// sample RGB positions and output
+}

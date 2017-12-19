@@ -1,0 +1,140 @@
+<ASX version = "3.0">
+<Title>"Nashe.ru: Nashe Radio"</Title>
+<Entry><Ref href = "http://radio02-cn03.akadostream.ru:8112/nashe128.mp3"/></Entry>
+<Title>"EuropaPlus.ru: EuropaPlus"</Title>
+<Entry><Ref href = "http://webcast.emg.fm:55655/europaplus128.mp3"/></Entry>
+<Title>"RusRadio.com.ua: Russkoe Radio"</Title>
+<Entry><Ref href = "http://online-rusradio.tavrmedia.ua:8000/RusRadio"/></Entry>
+<Title>"Radiorecord.fm: Record Radio"</Title>
+<Entry><Ref href = "http://www.radiorecord.fm/listen/record_128k"/></Entry>
+<Title>"Radiorecord.fm: Trancemission"</Title>
+<Entry><Ref href = "http://online.radiorecord.ru:8102/tm_128"/></Entry>
+<Title>"Radiorecord.fm: Pirate Station"</Title>
+<Entry><Ref href = "http://online.radiorecord.ru:8102/ps_128"/></Entry>
+<Title>"Radiorecord.fm: Record Chill Out"</Title>
+<Entry><Ref href = "http://online.radiorecord.ru:8102/chil_128"/></Entry>
+<Title>"Radiorecord.fm: Record Dancecore"</Title>
+<Entry><Ref href = "http://online.radiorecord.ru:8102/dc_128"/></Entry>
+<Title>"Radiorecord.fm: VIP Mix"</Title>
+<Entry><Ref href = "http://online.radiorecord.ru:8102/vip_128"/></Entry>
+<Title>"Radiorecord.fm: Record Club"</Title>
+<Entry><Ref href = "http://online.radiorecord.ru:8102/club_128"/></Entry>
+<Title>"Radiorecord.fm: Super Discoteka 90-x"</Title>
+<Entry><Ref href = "http://online.radiorecord.ru:8102/sd90_128"/></Entry>
+<Title>"Radiorecord.fm: GOP FM"</Title>
+<Entry><Ref href = "http://online.radiorecord.ru:8102/gop_128"/></Entry>
+<Title>"Radiorecord.fm: Medlyak FM"</Title>
+<Entry><Ref href = "http://online.radiorecord.ru:8102/mdl_128"/></Entry>
+<Title>"MyRadio.ua: Acid Jazz"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/newjazz128.ogg"/></Entry>
+<Title>"MyRadio.ua: Alternative Rock"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/Alternative_Rock128.ogg"/></Entry>
+<Title>"MyRadio.ua: Ballads"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/Ballads128.ogg"/></Entry>
+<Title>"MyRadio.ua: Best of OLD"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/Old128.ogg"/></Entry>
+<Title>"MyRadio.ua: Blues"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/blues128.ogg"/></Entry>
+<Title>"MyRadio.ua: BreakBeat"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/breakbeat128.ogg"/></Entry>
+<Title>"MyRadio.ua: Country"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/country128.ogg"/></Entry>
+<Title>"MyRadio.ua: Dance Club"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/dance128.ogg"/></Entry>
+<Title>"MyRadio.ua: Disco 80-х"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/Disco128.ogg"/></Entry>
+<Title>"MyRadio.ua: Drum And Bass"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/DrumAndBass128.ogg"/></Entry>
+<Title>"MyRadio.ua: Electro House"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/Electro-House128.ogg"/></Entry>
+<Title>"MyRadio.ua: Gothic"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/Gothic128.ogg"/></Entry>
+<Title>"MyRadio.ua: Hard Rock"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/HardRock128.ogg"/></Entry>
+<Title>"MyRadio.ua: Heavy Metal"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/heavymetal128.ogg"/></Entry>
+<Title>"MyRadio.ua: Jazz"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/Jazz128.ogg"/></Entry>
+<Title>"MyRadio.ua: Jazz-Rock & Fusion"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/JazzRockFusion128.ogg"/></Entry>
+<Title>"MyRadio.ua: Latino"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/latino128.ogg"/></Entry>
+<Title>"MyRadio.ua: Lounge"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/LOUNGE128.ogg"/></Entry>
+<Title>"MyRadio.ua: Mainstream Rock"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/main_stream_rock128.ogg"/></Entry>
+<Title>"MyRadio.ua: New Age new"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/new-age128.ogg"/></Entry>
+<Title>"MyRadio.ua: Punk"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/Punk128.ogg"/></Entry>
+<Title>"MyRadio.ua: RnB"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/RnB128.ogg"/></Entry>
+<Title>"MyRadio.ua: Rock-n-Roll"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/rock-n-roll128.ogg"/></Entry>
+<Title>"MyRadio.ua: Soundtrack"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/soundtrack128.ogg"/></Entry>
+<Title>"MyRadio.ua: Thrash & Metal"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/Trash_Metal128.ogg"/></Entry>
+<Title>"MyRadio.ua: Trance&Progressive"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/trance128.ogg"/></Entry>
+<Title>"MyRadio.ua: World Hit"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/world-hit128.ogg"/></Entry>
+<Title>"MyRadio.ua: Авторская песня"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/bard128.ogg"/></Entry>
+<Title>"MyRadio.ua: Детские песни"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/kids-songs128.ogg"/></Entry>
+<Title>"MyRadio.ua: Евровидение"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/eurovision2010128.ogg"/></Entry>
+<Title>"MyRadio.ua: Инсталляции"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/Installation128.ogg"/></Entry>
+<Title>"MyRadio.ua: Итальянская музыка"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/italjanskaja-muzyka128.ogg"/></Entry>
+<Title>"MyRadio.ua: Классическая музыка"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/Classica128.ogg"/></Entry>
+<Title>"MyRadio.ua: Лирика Шансона"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/shansonlyrics128.ogg"/></Entry>
+<Title>"MyRadio.ua: Музыка Kaзaнтипа"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/Kazantip128.ogg"/></Entry>
+<Title>"MyRadio.ua: Музыка Кино"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/kino128.ogg"/></Entry>
+<Title>"MyRadio.ua: Поп-Рок"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/pop-rock128.ogg"/></Entry>
+<Title>"MyRadio.ua: Поп-Хит"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/pophit128.ogg"/></Entry>
+<Title>"MyRadio.ua: Прикольные песни"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/Kapec128.ogg"/></Entry>
+<Title>"MyRadio.ua: Регги"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/funkreggi128.ogg"/></Entry>
+<Title>"MyRadio.ua: Рок Музыка"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/rockmusic128.ogg"/></Entry>
+<Title>"MyRadio.ua: Русская Лирика"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/RusLyrics128.ogg"/></Entry>
+<Title>"MyRadio.ua: Русский Рок"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/RusRock128.ogg"/></Entry>
+<Title>"MyRadio.ua: Русский Рэп"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/rep128.ogg"/></Entry>
+<Title>"MyRadio.ua: Русский Хит"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/Rus-pop128.ogg"/></Entry>
+<Title>"MyRadio.ua: Тільки Українське"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/onlyukraine128.ogg"/></Entry>
+<Title>"MyRadio.ua: Техно"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/techno128.ogg"/></Entry>
+<Title>"MyRadio.ua: Українське весілля"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/ukrainian_wedding128.ogg"/></Entry>
+<Title>"MyRadio.ua: Украинская тяжелая музыка"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/ukrainian_heavy_music128.ogg"/></Entry>
+<Title>"MyRadio.ua: Украинский Рок"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/PopRock128.ogg"/></Entry>
+<Title>"MyRadio.ua: Украинский Хит"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/UkrPophit128.ogg"/></Entry>
+<Title>"MyRadio.ua: Французская Музыка"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/france128.ogg"/></Entry>
+<Title>"MyRadio.ua: Хип-Хоп"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/hip-hop128.ogg"/></Entry>
+<Title>"MyRadio.ua: Хиты 90-х"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/Hits90s128.ogg"/></Entry>
+<Title>"MyRadio.ua: Шансон"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/shanson128.ogg"/></Entry>
+<Title>"MyRadio.ua: Этно"</Title>
+<Entry><Ref href = "http://music.myradio.com.ua:8000/sheshory128.ogg"/></Entry>
+</ASX>

@@ -1,0 +1,105 @@
+﻿DAUMPLAYLIST
+playname=rtsp://213.186.127.42:1935/live/_definst_/ren.stream
+playtime=0
+1*file*rtsp://213.186.127.42:1935/live/_definst_/first.stream
+1*title*1-й
+1*played*0
+2*file*rtsp://iptv.karelia.ru/ort.sdp
+2*title*Первый
+2*played*0
+3*file*rtsp://213.186.127.42:1935/live/_definst_/rus1.stream
+3*title*РОССИЯ 1
+3*played*0
+4*file*rtsp://213.186.127.42:1935/live/_definst_/rus2.stream
+4*title*РОССИЯ 2
+4*played*0
+5*file*rtsp://213.186.127.42:1935/live/_definst_/rus24.stream
+5*title*РОССИЯ 24
+5*played*0
+6*file*mms://live.rfn.ru/vesti_24
+6*title*РОССИЯ 24
+6*played*0
+7*file*rtsp://213.186.127.42:1935/live/_definst_/kultura.stream
+7*title*РОССИЯ К
+7*played*0
+8*file*rtsp://95.67.65.135:1935/rtplive/rtrplaneta_m.stream
+8*title*РОССИЯ РТР
+8*played*0
+9*file*rtsp://213.186.127.42:1935/live/_definst_/sts.stream
+9*title*СТС
+9*played*1
+10*file*rtsp://213.186.127.42:1935/live/_definst_/ren.stream
+10*title*РЕН
+10*played*0
+11*file*http://tv.trkterra.ru:1234/
+11*title*РЕН TERRA
+11*played*0
+12*file*rtsp://213.186.127.42:1935/live/_definst_/tv3.stream
+12*title*ТВ 3
+12*played*0
+13*file*rtsp://213.186.127.42:1935/live/_definst_/ntv.stream
+13*title*НТВ
+13*played*0
+14*file*rtsp://213.186.127.42:1935/live/_definst_/tvc.stream
+14*title*ТВ Ц
+14*played*0
+15*file*rtsp://213.186.127.42:1935/live/_definst_/5kanal.stream
+15*title*5
+15*played*0
+16*file*rtsp://213.186.127.42:1935/live/_definst_/zvezda.stream
+16*title*ЗВЕЗДА
+16*played*0
+17*file*mms://livecast.tvr.by/video
+17*title*БЕЛАРУСЬ
+17*played*0
+18*file*mms://93.125.30.14/video
+18*title*Беларусь
+18*played*0
+19*file*rtsp://213.186.127.42:1935/live/_definst_/dom.stream
+19*title*ДОМ
+19*played*0
+20*file*rtsp://213.186.127.42:1935/live/_definst_/karusel.stream
+20*title*Карусель
+20*played*0
+21*file*mms://mms.rrsat-internet.tv/smile
+21*title*Мульт
+21*played*0
+22*file*rtsp://213.186.127.42:1935/live/_definst_/7tv.stream
+22*title*Disney
+22*played*0
+23*file*rtsp://213.186.127.42:1935/live/_definst_/rutv.stream
+23*title*RU TV
+23*played*0
+24*file*rtsp://213.186.127.42:1935/live/_definst_/muztv.stream
+24*title*МУЗ ТВ
+24*played*0
+25*file*rtsp://213.186.127.42:1935/live/_definst_/mtv.stream
+25*title*MTV
+25*played*0
+26*file*rtsp://81.177.35.205/musicbox-live/musicbox.sdp
+26*title*RUSSIAN MusicBox
+26*played*0
+27*file*rtsp://213.186.127.42:1935/live/_definst_/bridgetv.stream
+27*title*BTV
+27*played*0
+28*file*mms://live.rfn.ru/rtr-planeta
+28*title*PLANETA НТН
+28*played*0
+29*file*rtsp://95.67.65.135:1935/rtplive/animalplanet_m.stream
+29*title*ПЛАНЕТА
+29*played*0
+30*file*rtsp://95.67.65.136:1935/rtplive/novyi_m.stream
+30*title*Н
+30*played*0
+31*file*mms://media.stv.lv/stvwsx
+31*title*СПОРТ
+31*played*1
+32*file*rtsp://95.67.65.135:1935/rtplive/sport1_m.stream
+32*title*ФУТБОЛ
+32*played*0
+33*file*mms://217.115.183.210/Ugra
+33*title*ЮРГА
+33*played*0
+34*file*mms://94.143.41.210:1755/myplanet
+34*title*Значок Человечка
+34*played*0

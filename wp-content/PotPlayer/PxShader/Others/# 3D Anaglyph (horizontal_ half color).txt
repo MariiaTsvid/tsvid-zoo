@@ -1,0 +1,26 @@
+// Anaglyph=ps_2_0
+
+// Optimized Anaglyph Shader V1.0 (C) 2010 Christian Hackbart, small redaction by VadimKVK
+
+sampler s0 : register(s0);
+float4 p0 : register(c0);
+
+#define width (p0[0])
+#define height (p0[1])
+
+float4 main(float2 tex : TEXCOORD0) : COLOR
+{
+	tex.x = tex.x / 2;
+
+	float4 l = tex2D(s0, tex);
+
+	tex.x = tex.x + 0.5;
+
+	float4 r = tex2D(s0, tex);
+
+	float red = l.g * 0.7 + l.b * 0.3;
+	float green = r.g;
+	float blue = r.b;
+
+	return float4(red, green, blue, 1);
+}

@@ -1,0 +1,39 @@
+// (C) 2011 Jan-Willem Krans (janwillem32 <at> hotmail.com)
+// This file is part of Video pixel shader pack.
+// This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 2.
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+// Catmull-Rom spline6 width resizer
+// This shader should be run as a screen space pixel shader if you are up-scaling.
+// This shader should not be run as a screen space pixel shader if you are down-scaling.
+// This shader requires compiling with ps_2_a, but higher is better, see http://en.wikipedia.org/wiki/Pixel_shader to look up what PS version your video card supports.
+// If possible, avoid compiling with the software emulation modes (ps_?_sw). Pixel shaders require a lot of processing power to run in real-time software mode.
+// This shader is meant to work with linear RGB input and output. Regular R'G'B' with a video gamma encoding will have to be converted with the linear gamma shaders to work properly.
+// Use this shader to scale the width of an image by Catmull-Rom spline6 interpolation.
+
+// fractions, either decimal or not, are allowed
+// set the magnification factor
+#define Magnify (4/3.)
+
+sampler s0;
+float c0;
+float c1;
+#define sp(a, b) float4 a = tex2D(s0, float2(coord+b*fx*c1, tex.y));
+
+float4 main(float2 tex : TEXCOORD0) : COLOR
+{
+	float coord = (tex.x/Magnify+.5-.5/Magnify)*c0;// assign the output position, normalized to texture width in pixels
+	float t = frac(coord);// calculate the difference between the output pixel and the original surrounding two pixels
+	// adjust sampling matrix to put the ouput pixel in the interval [Q2, Q2+.5]
+	float fx;
+	if(t > .5) {coord = (coord-t+1.5)*c1; t = 1.-t; fx = -1;}
+	else {coord = (coord-t+.5)*c1; fx = 1;}
+	t *= 4;// compensate for the two iterations
+
+	sp(Q0, -2) sp(Q1, -1) sp(Q2, 0) sp(Q3, 1) sp(Q4, 2)// original pixels
+	if(t <= 1) return (((Q0*3/256.-Q1*7/128.+Q2*3/32.-Q3*9/128.+Q4*5/256.)*t+Q1*19/128.+Q3*21/128.-Q0*7/256.-Q2/4.-Q4*9/256.)*t+(Q3-Q1)*21/128.+(Q0-Q4)*5/256.)*t+Q2;// output interpolated value for the interval [Q2, Q2+.25]
+	sp(Q5, 3)// sample an additional pixel
+	t -= 1.;
+	return (((((Q0+Q4)*3+Q2*26+Q5-Q1*15-Q3*18)*t+Q1*35+Q3*30-Q0*5-Q2*58-Q4-Q5)*t+Q3*144-(Q1+Q4)*16-Q2*112)*t+Q0*2+Q2*432+Q3*132-Q1*36-Q4*18)/512.;// output interpolated value for the interval (Q2+.25, Q2+.5]
+}

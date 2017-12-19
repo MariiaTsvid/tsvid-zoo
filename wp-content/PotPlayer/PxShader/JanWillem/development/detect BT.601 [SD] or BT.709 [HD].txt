@@ -1,0 +1,24 @@
+// (C) 2011 Jan-Willem Krans (janwillem32 <at> hotmail.com)
+// This file is part of Video pixel shader pack.
+// This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 2.
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+// detect BT.601 [SD] or BT.709 [HD]
+// This shader can be run as a screen space pixel shader.
+// This shader requires compiling with ps_2_0, but higher is better, see http://en.wikipedia.org/wiki/Pixel_shader to look up what PS version your video card supports.
+// If possible, avoid compiling with the software emulation modes (ps_?_sw). Pixel shaders require a lot of processing power to run in real-time software mode.
+// This shader will detect HD and SD resolutions.
+// The lowest HD resolution frame is defined as 1280×720, aspect ratio 9/16.
+// The standard allows up to 1/8 to be lost due to overscan for both width and height; 1280*7/8=1120 & 720*7/8=630
+// The lowest aspect ratio is 1/2.40, height is then limited; floor(1120/2.40)=466
+// The highest aspect ratio is 3/4=.75, width is then limited; floor(630/.75)=840
+// The detection rule for HD must apply for both 1120×466 and 840×630 resolutions.
+
+float2 c0;
+
+float4 main() : COLOR
+{
+	if(c0.x < 1120 && c0.y < 630) return float4(0, 0, 1, 1);// SD, blue output
+	return float4(1, 0, 0, 1);// HD, red output
+}

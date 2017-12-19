@@ -1,0 +1,30 @@
+// (C) 2011 Jan-Willem Krans (janwillem32 <at> hotmail.com)
+// This file is part of Video pixel shader pack.
+// This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 2.
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+// Mitchell-Netravali cubic5 width doubler
+// This shader should be run as a screen space pixel shader.
+// This shader requires compiling with ps_2_0, but higher is better, see http://en.wikipedia.org/wiki/Pixel_shader to look up what PS version your video card supports.
+// If possible, avoid compiling with the software emulation modes (ps_?_sw). Pixel shaders require a lot of processing power to run in real-time software mode.
+// This shader is meant to work with linear RGB input and output. Regular R'G'B' with a video gamma encoding will have to be converted with the linear gamma shaders to work properly.
+// Use this shader to double the width of an image by Mitchell-Netravali cubic5 interpolation.
+
+sampler s0;
+float c0;
+float c1;
+#define sp(a, b) float4 a = tex2D(s0, float2(coord+b*fx*c1.x, tex.y));
+
+float4 main(float2 tex : TEXCOORD0) : COLOR
+{
+	float coord = (tex.x/2.+.25)*c0;// assign the output position, normalized to texture width in pixels
+	float t = frac(coord);// calculate the difference between the output pixel and the original surrounding two pixels
+	// adjust sampling matrix to put the ouput pixel on Q2+.25
+	float fx;
+	if(t > .5) {coord = (coord-t+1.5)*c1; fx = -1;}
+	else {coord = (coord-t+.5)*c1; fx = 1;}
+
+	sp(Q0, -2) sp(Q1, -1) sp(Q2, 0) sp(Q3, 1) sp(Q4, 2)// original pixels
+	return Q0*25/20736.+Q2*16632/20736.+Q3*5234/20736.-Q1*770/20736.-Q4*385/20736.;// output interpolated value
+}

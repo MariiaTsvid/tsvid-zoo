@@ -1,0 +1,14 @@
+// Spotlight=ps_2_0
+
+// This shader can be run as a screen space pixel shader.
+// This shader requires compiling with ps_2_0, but higher is better, see http://en.wikipedia.org/wiki/Pixel_shader to look up what PS version your video card supports.
+// If possible, avoid compiling with the software emulation modes (ps_?_sw). Pixel shaders require a lot of processing power to run in real-time software mode.
+// Use this shader to add a moving spotlight effect to a video.
+
+sampler s0;
+float4 c0;
+
+float4 main(float2 tex : TEXCOORD0) : COLOR
+{
+	return tex2D(s0, tex)*pow(dot(normalize(float3(sin(c0.w*1.9)/2.+.5, cos(c0.w*1.5)/2+.5, 1)-float3(tex.x, tex.y*c0.y/c0.x, 0)), float3(0, 0, 1)), 50); // darken the areas outside of the spotlight and output
+}

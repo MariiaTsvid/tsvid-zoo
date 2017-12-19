@@ -1,0 +1,74 @@
+// (C) 2011 Jan-Willem Krans (janwillem32 <at> hotmail.com)
+// This file is part of Video pixel shader pack.
+// This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 2.
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+// 3LCD panel horizontal software alignment, Catmull-Rom spline6 interpolated
+// This shader should be run as a screen space pixel shader.
+// This shader requires compiling with ps_2_a, but higher is better, see http://en.wikipedia.org/wiki/Pixel_shader to look up what PS version your video card supports.
+// If possible, avoid compiling with the software emulation modes (ps_?_sw). Pixel shaders require a lot of processing power to run in real-time software mode.
+// This shader is meant to work with linear RGB input and output. Regular R'G'B' with a video gamma encoding will have to be converted with the linear gamma shaders to work properly.
+// This shader can only work when the display device receives input in its native display resolution, with over- and underscan disabled. This is to facilitate 1:1 pixel mapping.
+// This shader can perform software alignment by Catmull-Rom spline6 interpolation for a 3LCD projector's red and blue panels.
+
+// fractions, either decimal or not, are allowed
+// set the horizontal resolution
+#define HorizontalResolution 1920.
+// RedControls and BlueControls, 0 is disabled, 1 is enabled
+#define RedControls 1
+#define BlueControls 1
+// RedShiftLeftToRight and BlueShiftLeftToRight, a value of 3. will shift three pixels to the right, 0 is disabled
+#define RedShiftLeftToRight 64.
+#define BlueShiftLeftToRight -64.
+// RedScaleHorizontal and BlueScaleHorizontal, the centered horizontal magnification factor, a value of HorizontalResolution-3. will scale the output to 3 pixels larger, a value of HorizontalResolution means disabled
+#define RedScaleHorizontal HorizontalResolution-128.
+#define BlueScaleHorizontal HorizontalResolution+128.
+// RedParallelogram and BlueParallelogram, the centered horizontal offset factor on the bottom, a value of 3. will shift 0 pixels to the left on the top, and 3 pixels to the left on the bottom, 0 is disabled
+#define RedParallelogram 256.
+#define BlueParallelogram -256.
+// RedKeystone and BlueKeystone, the centered horizontal magnification factor on the bottom, a value of -3. will scale the output to 0 pixels larger on the top, and 3 pixels larger on the bottom, 0 is disabled
+#define RedKeystone -192.
+#define BlueKeystone 192.
+
+sampler s0;
+#define spR(a, o) float a = tex2D(s0, float2(coordR+o*fxR/HorizontalResolution, tex.y)).r;
+#define spB(a, o) float a = tex2D(s0, float2(coordB+o*fxB/HorizontalResolution, tex.y)).b;
+
+float4 main(float2 tex : TEXCOORD0) : COLOR
+{
+	float4 s1 = tex2D(s0, tex);// base pixel
+#if RedControls == 1
+	float coordR = (tex.x-.5)*(RedScaleHorizontal+tex.y*RedKeystone)+.5*HorizontalResolution-RedShiftLeftToRight+tex.y*RedParallelogram;// assign the output position, normalized to texture width in pixels
+	float tR = frac(coordR);// calculate the difference between the output pixel and the original surrounding two pixels
+	// adjust sampling matrix to put the ouput pixel in the interval [R2, R2+.5]
+	float fxR;
+	if(tR > .5) {coordR = (coordR-tR+1.5)/HorizontalResolution; tR = 1.-tR; fxR = -1;}
+	else {coordR = (coordR-tR+.5)/HorizontalResolution; fxR = 1;}
+	tR *= 4;// compensate for the two iterations
+
+	spR(R0, -2) spR(R1, -1) spR(R2, 0) spR(R3, 1) spR(R4, 2)// original pixels
+	if(tR <= 1) s1.r = (((R0*3/256.-R1*7/128.+R2*3/32.-R3*9/128.+R4*5/256.)*tR+R1*19/128.+R3*21/128.-R0*7/256.-R2/4.-R4*9/256.)*tR+(R3-R1)*21/128.+(R0-R4)*5/256.)*tR+R2;// insert interpolated value for the interval [R2, R2+.25]
+	else {
+		spR(R5, 3)// sample an additional pixel
+		tR -= 1.;
+		s1.r = (((((R0+R4)*3+R2*26+R5-R1*15-R3*18)*tR+R1*35+R3*30-R0*5-R2*58-R4-R5)*tR+R3*144-(R1+R4)*16-R2*112)*tR+R0*2+R2*432+R3*132-R1*36-R4*18)/512.;}// insert interpolated value for the interval (R2+.25, R2+.5]
+#endif
+#if BlueControls == 1
+	float coordB = (tex.x-.5)*(BlueScaleHorizontal+tex.y*BlueKeystone)+.5*HorizontalResolution-BlueShiftLeftToRight+tex.y*BlueParallelogram;// assign the output position, normalized to texture width in pixels
+	float tB = frac(coordB);// calculate the difference between the output pixel and the original surrounding two pixels
+	// adjust sampling matrix to put the ouput pixel in the interval [B2, B2+.5]
+	float fxB;
+	if(tB > .5) {coordB = (coordB-tB+1.5)/HorizontalResolution; tB = 1.-tB; fxB = -1;}
+	else {coordB = (coordB-tB+.5)/HorizontalResolution; fxB = 1;}
+	tB *= 4;// compensate for the two iterations
+
+	spB(B0, -2) spB(B1, -1) spB(B2, 0) spB(B3, 1) spB(B4, 2)// original pixels
+	if(tB <= 1) s1.b = (((B0*3/256.-B1*7/128.+B2*3/32.-B3*9/128.+B4*5/256.)*tB+B1*19/128.+B3*21/128.-B0*7/256.-B2/4.-B4*9/256.)*tB+(B3-B1)*21/128.+(B0-B4)*5/256.)*tB+B2;// insert interpolated value for the interval [B2, B2+.25]
+	else {
+		spB(B5, 3)// sample an additional pixel
+		tB -= 1.;
+		s1.b = (((((B0+B4)*3+B2*26+B5-B1*15-B3*18)*tB+B1*35+B3*30-B0*5-B2*58-B4-B5)*tB+B3*144-(B1+B4)*16-B2*112)*tB+B0*2+B2*432+B3*132-B1*36-B4*18)/512.;}// insert interpolated value for the interval (B2+.25, B2+.5]
+#endif
+	return s1;
+}

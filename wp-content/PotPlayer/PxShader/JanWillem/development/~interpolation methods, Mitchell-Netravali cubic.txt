@@ -1,0 +1,68 @@
+(C) 2011 Jan-Willem Krans (janwillem32 <at> hotmail.com)
+This file is part of Video pixel shader pack.
+This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 2.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+interpolation methods, Mitchell-Netravali cubic
+
+iteration pyramid:
+p       p       p       p       p      p
+            s       s       s
+              r   r   r
+                 q/q
+Note: the interval (p2+.5, p3) is handled by the mirror function 1.-t, all valid values for t are in the interval [p2, p2+.5]
+
+weights function:
+t2 = pow(t, 2);
+t3 = pow(t, 3);
+w0 = 1/18.+t2*5/6.-t3*7/18.-t/2.;
+w1 = 8/9.+t3*7/6.-t2*2;
+w2 = 1/18.+t2*1.5+t/2.-t3*7/6.;
+w3 = t3*7/18.-t2/3.;
+
+convolution function cubic4, t is in the interval [m1, m2):
+n = (((((m1-m2)*21+(m3-m0)*7)*t+m0*15+m2*27-m1*36-m3*6)*t+(m2-m0)*9)*t+m0+m1*16+m2)/18.;
+
+control points:
+.5 weights:
+t = .5;
+t2 = .25;
+t3 = .125;
+
+filling in the weights:
+w0 = -5/144.;
+w1 = 77/144.;
+w2 = 77/144.;
+w3 = -5/144.;
+
+----------------
+s0 (window: p0, p1, p2, p3):
+s0 = (p1*77+p2*77-p0*5-p3*5)/144.;
+
+s1 (window: p1, p2, p3, p4):
+s1 = (p2*77+p3*77-p1*5-p4*5)/144.;
+
+s2 (window: p2, p3, p4, p5):
+s2 = (p3*77+p4*77-p2*5-p5*5)/144.;
+
+----------------
+r0 (window: p1, s0, p2, s1):
+r0 = (s0*77+p2*77-p1*5-s1*5)/144.;
+r0 = (p1*5234+p2*16632+p4*25-p0*385-p3*770)/20736.;
+
+r1 (cubic5, window: s0, p2, s1, p3):
+r1 = (p2*77+s1*77-s0*5-p3*5)/144.;
+r1 = (p0*25+p2*16632+p3*5234-p1*770-p4*385)/20736.;
+r1 = p0*25/20736.+p2*16632/20736.+p3*5234/20736.-p1*770/20736.-p4*385/20736.;
+
+r2 (window: p2, s1, p3, s2):
+r2 = (s1*77+p3*77-p2*5-s2*5)/144.;
+r2 = (p2*5234+p3*16632+p5*25-p1*385-p4*770)/20736.;
+
+----------------
+f(t) q0, cubic6, interval [p2, p2+.25] (window: r0, p2, r1, s1):
+q0 = (((p0*1085/186624.+p2*329/2592.+p4*1435/186624.-p1*6377/93312.-p3*6727/93312.)*t+p1*2585/15552.+p3*2635/15552.-p0*425/31104.-p2*265/864.-p4*475/31104.)*t+(p0-p4)*205/20736.+(p3-p1)*1501/10368.)*t+(p1+p3)*31/2592.+p2*845/864.-(p0+p4)*5/5184.;
+
+f(t) q1, cubic6, interval (p2+.25, p2+.5] (window: p2, r1, s1, r2):
+q1 = (((p0*175/124416.+p2*3955/186624.+p4*1645/373248.+p5*175/373248.-p1*3745/373248.-p3*1085/62208.)*t+p1*1765/62208.+p3*155/5184.-p0*25/10368.-p2*1645/31104.-p4*5/1944.-p5*25/62208.)*t+p3*77/288.-(p1+p4)*5/288.-p2*67/288.)*t+p0*25/23328.+p2*2069/2592.+p3*5927/23328.-p1*815/23328.-p4*215/11664.;

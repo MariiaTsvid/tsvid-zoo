@@ -1,0 +1,25 @@
+// (C) 2011 Jan-Willem Krans (janwillem32 <at> hotmail.com)
+// This file is part of Video pixel shader pack.
+// This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 2.
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+// pillarbox
+// This shader can be run as a screen space pixel shader.
+// This shader requires compiling with ps_2_0, but higher is better, see http://en.wikipedia.org/wiki/Pixel_shader to look up what PS version your video card supports.
+// If possible, avoid compiling with the software emulation modes (ps_?_sw). Pixel shaders require a lot of processing power to run in real-time software mode.
+// Use this shader only if you need to add black bars at the left and right of an image.
+
+// fractions, either decimal or not, are allowed
+// Ratio, width/height
+#define Ratio 4/3.
+
+sampler s0;
+float2 c0;
+
+float4 main(float2 tex : TEXCOORD0) : COLOR
+{
+	float w = .5-c0.y/c0.x*Ratio/2.;// relate the original aspect ratio to the new one
+	if(tex.x >= w && tex.x <= 1.-w) return tex2D(s0, tex);// output the original pixel if it is inside the pillarbox
+	return float4(0, 0, 0, 1);// output the black bars of the pillarbox
+}

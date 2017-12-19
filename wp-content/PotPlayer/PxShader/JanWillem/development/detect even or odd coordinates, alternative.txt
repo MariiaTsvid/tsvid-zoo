@@ -1,0 +1,28 @@
+// (C) 2011 Jan-Willem Krans (janwillem32 <at> hotmail.com)
+// This file is part of Video pixel shader pack.
+// This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 2.
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+// detect even or odd coordinates, alternative
+// This shader can be run as a screen space pixel shader.
+// This shader requires compiling with ps_3_0, see http://en.wikipedia.org/wiki/Pixel_shader to look up what PS version your video card supports.
+// If possible, avoid compiling with the software emulation modes (ps_?_sw). Pixel shaders require a lot of processing power to run in real-time software mode.
+// This shader will draw a grid of pixels, with colors depending on even or odd horizontal and vertical coordinates.
+
+float4 main(float2 pos : VPOS) : COLOR
+{
+	float2 n = frac(pos*c0/2.);
+	n.x = (n.x < .25)? 1 : -1;// even x positive, odd x negative
+	n.y = (n.y < .25)? 1 : -1;// even y positive, odd y negative
+	if(n.x == -1) {
+		if(n.y == -1) return float4(0, 0, 0, 1);// odd x and odd y, black output
+		if(n.y == 1) return float4(0, 0, 1, 1);// odd x and even y, blue output
+		return float4(1, 0, 1, 1);}// error, magenta output
+	if(n.x == 1) {
+		if(n.y == -1) return float4(0, 1, 1, 1);// even x and odd y, cyan output
+		if(n.y == 1) return float4(0, 1, 0, 1);// even x and even y, green output
+		return float4(1, 1, 0, 1);}// error, yellow output
+	if(n.y == 1) return 1;// error, white output
+	return float4(1, 0, 0, 1);// error, red output
+}

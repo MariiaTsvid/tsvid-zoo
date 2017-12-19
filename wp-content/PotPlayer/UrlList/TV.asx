@@ -1,0 +1,128 @@
+﻿<asx version = "3.0" >
+
+<entry>
+    <title>МУЗ ТВ</title>
+    <ref href = "rtsp://213.186.127.42:1935/live/_definst_/muztv.stream"/>
+</entry>
+
+<entry>
+    <title>RU TV</title>
+    <ref href = "rtsp://213.186.127.42:1935/live/_definst_/rutv.stream"/>
+</entry>
+
+<entry>
+    <title>MTV</title>
+    <ref href = "rtsp://213.186.127.42:1935/live/_definst_/mtv.stream"/>
+</entry>
+
+<entry>
+    <title>BRIDGE TV</title>
+    <ref href = "rtsp://213.186.127.42:1935/live/_definst_/bridgetv.stream"/>
+</entry>
+
+<entry>
+    <title>MUSICBOX</title>
+    <ref href = "rtsp://81.177.35.205/musicbox-live/musicbox.sdp"/>
+</entry>
+
+<entry>
+    <title>2x2</title>
+    <ref href = "http://217.12.195.104:4563"/>
+</entry>
+
+<entry>
+    <title>ТВ 3</title>
+    <ref href = "rtsp://213.186.127.42:1935/live/_definst_/tv3.stream"/>
+</entry>
+
+<entry>
+    <title>Первый канал</title>
+    <ref href = "rtsp://213.186.127.42:1935/live/_definst_/first.stream"/>
+</entry>
+
+<entry>
+    <title>Россия 1</title>
+    <ref href = "rtsp://213.186.127.42:1935/live/_definst_/rus1.stream"/>
+</entry>
+
+<entry>
+    <title>НТВ</title>
+    <ref href = "rtsp://213.186.127.42:1935/live/_definst_/ntv.stream"/>
+</entry>
+
+<entry>
+    <title>РЕН ТВ</title>
+    <ref href = "rtsp://213.186.127.42:1935/live/_definst_/ren.stream"/>
+</entry>
+
+<entry>
+    <title>Пятый канал</title>
+    <ref href = "rtsp://213.186.127.42:1935/live/_definst_/5kanal.stream"/>
+</entry>
+
+<entry>
+    <title>СТС</title>
+    <ref href = "rtsp://213.186.127.42:1935/live/_definst_/sts.stream"/>
+</entry>
+
+<entry>
+    <title>ТВЦ</title>
+    <ref href = "rtsp://213.186.127.42:1935/live/_definst_/tvc.stream"/>
+</entry>
+
+<entry>
+    <title>Звезда</title>
+    <ref href = "rtsp://213.186.127.42:1935/live/_definst_/zvezda.stream"/>
+</entry>
+
+<entry>
+    <title>Домашний</title>
+    <ref href = "rtsp://213.186.127.42:1935/live/_definst_/dom.stream"/>
+</entry>
+
+<entry>
+    <title>Карусель</title>
+    <ref href = "rtsp://213.186.127.42:1935/live/_definst_/karusel.stream"/>
+</entry>
+
+<entry>
+    <title>Disney</title>
+    <ref href = "rtsp://213.186.127.42:1935/live/_definst_/7tv.stream"/>
+</entry>
+
+<entry>
+    <title>Animal Planet</title>
+    <ref href = "rtsp://95.67.65.135:1935/rtplive/animalplanet_m.stream"/>
+</entry>
+
+<entry>
+    <title>Россия 2</title>
+    <ref href = "rtsp://213.186.127.42:1935/live/_definst_/rus2.stream"/>
+</entry>
+
+<entry>
+    <title>Россия 24</title>
+    <ref href = "rtsp://213.186.127.42:1935/live/_definst_/rus24.stream"/>
+</entry>
+
+<entry>
+    <title>Россия К</title>
+    <ref href = "rtsp://213.186.127.42:1935/live/_definst_/kultura.stream"/>
+</entry>
+
+<entry>
+    <title>Россия РТР</title>
+    <ref href = "rtsp://95.67.65.135:1935/rtplive/rtrplaneta_m.stream"/>
+</entry>
+
+<entry>
+    <title>HD Media</title>
+    <ref href = "http://89.208.33.168:8100/"/>
+  </entry>
+
+  <entry>
+    <title>space.station.live.webcam</title>
+    <ref href = "mms://a1709.l1856953708.c18569.g.lm.akamaistream.net/D/1709/18569/v0001/reflector:53708"/>
+  </entry>
+
+</asx>

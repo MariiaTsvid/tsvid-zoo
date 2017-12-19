@@ -1,0 +1,96 @@
+// (C) 2011 Jan-Willem Krans (janwillem32 <at> hotmail.com)
+// This file is part of Video pixel shader pack.
+// This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 2.
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+// special 4�2�2 Catmull-Rom spline5 chroma up-sampling and color controls for floating point surfaces
+// This shader should not be run as a screen space pixel shader.
+// This shader requires compiling with ps_2_0, but higher is better, see http://en.wikipedia.org/wiki/Pixel_shader to look up what PS version your video card supports.
+// When a lot of color controls are enabled, this shader will require compiling with at least ps_2_a.
+// If possible, avoid compiling with the software emulation modes (ps_?_sw). Pixel shaders require a lot of processing power to run in real-time software mode.
+// If used in combination with other shaders and filters, place this and other Y'CbCr-type shaders at the beginning of the processing chain.
+// Use this shader if the 4:2:2 sub-sampled chroma gets up-sampled in hardware by doubling the values, instead of interpolating between them.
+// The most notable artifacts produced by this problem are wide 2-by-1-sized pixel blocks if a red object is next to a dark background.
+// You can use the "chroma for SD&HD video input" shader with 200% picture magnification to test. It will make wide 4-by-2-sized pixel blocks everywhere in the picture if the up-sampling is wrong.
+// This shader can only use Y'CbCr input.
+
+// YCbCrColorControls, RGBColorControls and LinearRGBOutput, 0 is disabled, 1 is enabled
+#define YCbCrColorControls 0
+#define RGBColorControls 0
+#define LinearRGBOutput 0
+// fractions, either decimal or not, are allowed
+// VideoGamma, interval [2., 3.], default 2.4, the video gamma input factor used to convert between the video input RGB and linear RGB
+#define VideoGamma 2.4
+// Brightness, interval [-10, 10], default 0
+#define Brightness 0
+// Contrast, interval [0, 10], default 1
+#define Contrast 1
+// GrayscaleGamma and ColorfulnessGamma, interval (0, 10], default 1
+#define GrayscaleGamma 1
+#define ColorfulnessGamma 1
+// Hue, interval [-180, 180], default 0
+#define Hue 0
+// Saturation, interval [0, 10], default 1
+#define Saturation 1
+// RedBrightness, GreenBrightness and BlueBrightness, interval [-10, 10], default 0
+#define RedBrightness 0
+#define GreenBrightness 0
+#define BlueBrightness 0
+// RedContrast, GreenContrast and BlueContrast, interval [0, 10], default 1
+#define RedContrast 1
+#define GreenContrast 1
+#define BlueContrast 1
+// RedGamma, GreenGamma and BlueGamma, interval (0, 10], default 1
+#define RedGamma 1
+#define GreenGamma 1
+#define BlueGamma 1
+
+sampler s0;
+float2 c0;
+float c1;
+#define sp(a, b) float3 a = tex2D(s0, tex+float2(b*n*c1, 0)).rgb;
+
+float4 main(float2 tex : TEXCOORD0) : COLOR
+{
+	// detect even or odd coordinates for 4:2:2 sub-sampled chroma
+	float n = frac(tex.x*c0.x/2.);
+	n = (n > .5)? 2 : -2;// even x positive, odd x negative
+
+	sp(Q0, -2) sp(Q1, -1) sp(Q2, 0) sp(Q3, 1) sp(Q4, 2)// original pixels
+	Q2 = float3(Q2.x, (Q0.yz+Q2.yz*216+Q3.yz*66-Q1.yz*18-Q4.yz*9)/256.);// interpolation
+
+#if YCbCrColorControls == 1
+	Q2.x = Q2.x*Contrast+Brightness;// process contrast and brightness
+	Q2.yz = 2*mul(float2x2(cos(radians(Hue)), sin(radians(Hue)), -sin(radians(Hue)), cos(radians(Hue))), Q2.yz)*Saturation;// process saturation and hue, extend the chroma interval from [-.5, .5] to [-1, 1] for gamma processing
+	// preserve the sign bits of Y'CbCr values
+	float3 sby = sign(Q2);
+	Q2 *= sby;
+	Q2 = sby*pow(Q2, float3(GrayscaleGamma, ColorfulnessGamma, ColorfulnessGamma));// gamma processing
+
+	if(c0.x < 1120 && c0.y < 630) Q2 = float3(Q2.x+.5*1.402*Q2.z, dot(Q2, float3(1, -.5*.202008/.587, -.5*.419198/.587)), Q2.x+.5*1.772*Q2.y);// SD Y'CbCr to RGB, compensate for the chroma ranges
+	else Q2 = float3(Q2.x+.5*1.5748*Q2.z, dot(Q2, float3(1, -.5*.1674679/.894, -.5*.4185031/.894)), Q2.x+.5*1.8556*Q2.y);// HD Y'CbCr to RGB, compensate for the chroma ranges
+#else
+	if(c0.x < 1120 && c0.y < 630) Q2 = float3(Q2.x+1.402*Q2.z, dot(Q2, float3(1, -.202008/.587, -.419198/.587)), Q2.x+1.772*Q2.y);// SD Y'CbCr to RGB
+	else Q2 = float3(Q2.x+1.5748*Q2.z, dot(Q2, float3(1, -.1674679/.894, -.4185031/.894)), Q2.x+1.8556*Q2.y);// HD Y'CbCr to RGB
+#endif
+
+#if LinearRGBOutput+RGBColorControls >= 1
+	// preserve the sign bits of RGB values
+	float3 sbl = sign(Q2);
+	Q2 *= sbl;
+	Q2 = sbl*pow(Q2, VideoGamma);// linear RGB gamma correction
+#endif
+#if RGBColorControls == 1
+	Q2 = Q2*float3(RedContrast, GreenContrast, BlueContrast)+float3(RedBrightness, GreenBrightness, BlueBrightness);// process contrast and brightness on the original pixel
+	// preserve the sign bits of RGB values
+	float3 sbr = sign(Q2);
+	Q2 *= sbr;
+#if LinearRGBOutput == 1
+	Q2 = sbr*pow(Q2, float3(RedGamma, GreenGamma, BlueGamma));// process gamma correction
+#else
+	Q2 = sbr*pow(Q2, float3(RedGamma, GreenGamma, BlueGamma)/VideoGamma);// process gamma correction, invert linear RGB gamma correction
+#endif
+#endif
+	return Q2.rgbb;// RGB output
+}

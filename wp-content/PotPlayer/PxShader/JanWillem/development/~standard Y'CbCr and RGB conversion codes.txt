@@ -1,0 +1,76 @@
+(C) 2011 Jan-Willem Krans (janwillem32 <at> hotmail.com)
+This file is part of Video pixel shader pack.
+This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 2.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+standard Y'CbCr and RGB conversion codes
+
+// shared
+#define muv .5
+// SD
+#define wrs .299
+#define wbs .114
+#define wgs .587
+#define urs -.1495/.886
+#define ugs -.2935/.886
+#define vgs -.2935/.701
+#define vbs -.057/.701
+#define rvs 1.402
+#define gus -.202008/.587
+#define gvs -.419198/.587
+#define bus 1.772
+// HD
+#define wrh .2126
+#define wbh .0722
+#define wgh .7152
+#define urh -.1063/.9278
+#define ugh -.3576/.9278
+#define vgh -.3576/.7874
+#define vbh -.0361/.7874
+#define rvh 1.5748
+#define guh -.1674679/.894
+#define gvh -.4185031/.894
+#define buh 1.8556
+
+// algebra, equal to the above
+#define muv .5
+#define wrs .299
+#define wbs .114
+#define wgs (1.-wrs-wbs)
+#define urs muv*-wrs/(1.-wbs)
+#define ugs muv*-wgs/(1.-wbs)
+#define vgs muv*-wgs/(1.-wrs)
+#define vbs muv*-wbs/(1.-wrs)
+#define rvs (1.-wrs)/muv
+#define gus (1.-wbs)*-wbs/wgs/muv
+#define gvs (1.-wrs)*-wrs/wgs/muv
+#define bus (1.-wbs)/muv
+#define wrh .2126
+#define wbh .0722
+#define wgh (1.-wrh-wbh)
+#define urh muv*-wrh/(1.-wbh)
+#define ugh muv*-wgh/(1.-wbh)
+#define vgh muv*-wgh/(1.-wrh)
+#define vbh muv*-wbh/(1.-wrh)
+#define rvh (1.-wrh)/muv
+#define guh (1.-wbh)*-wbh/wgh/muv
+#define gvh (1.-wrh)*-wrh/wgh/muv
+#define buh (1.-wbh)/muv
+
+This is for GPU based conversions, as the dot operation takes only one assembly instruction and no intermediate registers on the GPU.
+On the CPU make sure that a variant of this part is programmed to use packed SSE2 or better, else these vector operations will be costly.
+HD
+s1 = float3(dot(float3(wrh, wgh, wbh), s1), dot(float3(urh, ugh, muv), s1), dot(float3(muv, vgh, vbh), s1));// HD RGB to Y'CbCr
+s1 = float3(s1.x+rvh*s1.z, dot(s1, float3(1, guh, gvh)), s1.x+buh*s1.y);// HD Y'CbCr to RGB
+SD
+s1 = float3(dot(float3(wrs, wgs, wbs), s1), dot(float3(urs, ugs, muv), s1), dot(float3(muv, vgs, vbs), s1));// SD RGB to Y'CbCr
+s1 = float3(s1.x+rvs*s1.z, dot(s1, float3(1, gus, gvs)), s1.x+bus*s1.y);// SD Y'CbCr to RGB
+
+R, G, B and Y' have an interval of [0, 1], Cb and Cr have an interval of [-.5, .5]
+compress ranges for 8-bit Y'CbCr:
+Y'*219/255.+16/255.
+CbCr*224/255.
+expand ranges for 8-bit Y'CbCr:
+Y'*255/219.-16/219.
+CbCr*255/224.
